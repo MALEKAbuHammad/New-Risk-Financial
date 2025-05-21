@@ -1,6 +1,7 @@
-streamlit
-openai
-langchain
+Flask
+python-dotenv
 pandas
 requests
-python-dotenv
+langchain
+openai
+faiss-cpu
