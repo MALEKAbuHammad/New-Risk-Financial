@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🤖 Agentic AI Financial Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.22.9/babel.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Roboto+Slab:wght@700&display=swap");
+
+      .main-container {
+        background-color: #f0f0f0;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        font-family: "Roboto", sans-serif;
+        color: #666666;
+      }
+      .main-header {
+        background: linear-gradient(90deg, #003366 0%, #3399cc 100%);
+        padding: 2.5rem;
+        border-radius: 15px;
+        color: white;
+        text-align: center;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        animation: fadeIn 1s ease-in-out;
+      }
+      .main-header h1 {
+        font-family: "Roboto Slab", serif;
+        font-size: 2.5em;
+        margin: 0;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+      .main-header p {
+        font-size: 1.2em;
+        opacity: 0.9;
+      }
+      .section-header {
+        font-family: "Roboto Slab", serif;
+        color: #003366;
+        font-size: 1.8em;
+        margin: 1.5rem 0 1rem;
+        border-bottom: 2px solid #3399cc;
+        padding-bottom: 0.5rem;
+      }
+      .question-box,
+      .answer-box {
+        background-color: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin: 1rem 0;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        transition: transform 0.3s ease;
+        border-left: 4px solid #003366;
+      }
+      .question-box:hover,
+      .answer-box:hover {
+        transform: translateY(-5px);
+      }
+      .agent-thinking {
+        background-color: #ecf0f1;
+        padding: 1rem;
+        border-radius: 10px;
+        color: #666666;
+        margin: 0.5rem 0;
+        font-style: italic;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      .metric-card {
+        background-color: white;
+        padding: 1rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #003366;
+        transition: transform 0.3s ease;
+      }
+      .metric-card:hover {
+        transform: translateY(-3px);
+      }
+      .data-source-card {
+        background-color: white;
+        padding: 1rem;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin: 0.5rem 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: transform 0.3s ease;
+      }
+      .data-source-card:hover {
+        transform: translateY(-3px);
+      }
+      .status-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        margin-right: 0.5rem;
+      }
+      .status-active {
+        background-color: #28a745;
+      }
+      .status-inactive {
+        background-color: #dc3545;
+      }
+      .status-limited {
+        background-color: #ffc107;
+      }
+      .data-source-info {
+        display: flex;
+        align-items: center;
+      }
+      .data-source-info strong {
+        color: #003366;
+        font-size: 1.1em;
+      }
+      .data-source-info small {
+        color: #666666;
+        margin-left: 0.5rem;
+        font-size: 0.9em;
+      }
+      .gold-prices {
+        background-color: #ffd700;
+        padding: 2rem;
+        border-radius: 15px;
+        color: white;
+        margin: 1rem 0;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        text-align: center;
+      }
+      .gold-prices h3 {
+        color: white;
+        font-size: 2em;
+      }
+      .gold-prices p {
+        font-size: 1.2em;
+        margin: 0.5rem 0;
+      }
+      .sidebar {
+        background-color: #003366;
+        color: white;
+        border-radius: 10px;
+        padding: 1rem;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      .sidebar-section {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+      }
+      .sidebar-section h3 {
+        color: #3399cc;
+        margin-top: 0;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .tab-list {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+      }
+      .tab {
+        background-color: #ecf0f1;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        color: #003366;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+      .tab-active {
+        background-color: #003366;
+        color: white;
+      }
+      .form-container {
+        background-color: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      .submit-button {
+        background-color: #003366;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        transition: transform 0.3s ease;
+      }
+      .submit-button:hover {
+        transform: scale(1.05);
+      }
+      .expander {
+        background-color: #ecf0f1;
+        border-radius: 8px;
+        margin: 0.5rem 0;
+        padding: 1rem;
+      }
+      .footer {
+        background-color: #003366;
+        padding: 2rem;
+        border-radius: 15px;
+        color: white;
+        text-align: center;
+        margin-top: 2rem;
+        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.2);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      const { useState, useEffect } = React;
+
+      // Mock data to simulate API responses
+      const COMPANY_SYMBOLS = [
+        "AAPL",
+        "MSFT",
+        "NVDA",
+        "AMZN",
+        "TSLA",
+        "GOOGL",
+        "META",
+        "BRK-B",
+        "AVGO",
+        "TSM",
+        "TM",
+        "BABA",
+        "V",
+        "WMT",
+        "JPM",
+        "NFLX",
+        "AMD",
+        "CRM",
+        "ORCL",
+        "ADBE",
+      ];
+
+      const mockYfinanceData = {
+        AAPL: {
+          history: Array.from({ length: 180 }, (_, i) => ({
+            Date: new Date(Date.now() - (180 - i) * 24 * 60 * 60 * 1000)
+              .toISOString()
+              .split("T")[0],
+            Close: 150 + Math.random() * 50,
+            Volume: 5000000 + Math.random() * 2000000,
+            Open: 150 + Math.random() * 50,
+            High: 155 + Math.random() * 50,
+            Low: 145 + Math.random() * 50,
+          })),
+          info: {
+            marketCap: 2500000000000,
+            sector: "Technology",
+            longName: "Apple Inc.",
+            currentPrice: 175.23,
+          },
+        },
+        MSFT: {
+          history: Array.from({ length: 180 }, (_, i) => ({
+            Date: new Date(Date.now() - (180 - i) * 24 * 60 * 60 * 1000)
+              .toISOString()
+              .split("T")[0],
+            Close: 300 + Math.random() * 100,
+            Volume: 4000000 + Math.random() * 1500000,
+            Open: 300 + Math.random() * 100,
+            High: 310 + Math.random() * 100,
+            Low: 290 + Math.random() * 100,
+          })),
+          info: {
+            marketCap: 2200000000000,
+            sector: "Technology",
+            longName: "Microsoft Corporation",
+            currentPrice: 325.45,
+          },
+        },
+        TSLA: {
+          history: Array.from({ length: 180 }, (_, i) => ({
+            Date: new Date(Date.now() - (180 - i) * 24 * 60 * 60 * 1000)
+              .toISOString()
+              .split("T")[0],
+            Close: 700 + Math.random() * 200,
+            Volume: 6000000 + Math.random() * 3000000,
+            Open: 700 + Math.random() * 200,
+            High: 720 + Math.random() * 200,
+            Low: 680 + Math.random() * 200,
+          })),
+          info: {
+            marketCap: 1000000000000,
+            sector: "Consumer Cyclical",
+            longName: "Tesla, Inc.",
+            currentPrice: 750.67,
+          },
+        },
+      };
+
+      const mockWorldBankData = {
+        gdp: {
+          USA: [21000, 21300, 21500, 21800, 22000],
+          CHN: [14000, 14200, 14400, 14600, 14800],
+          JPN: [5000, 5100, 5200, 5300, 5400],
+        },
+        inflation: {
+          USA: [2.5, 1.8, 2.0, 4.7, 3.2],
+          CHN: [2.0, 2.9, 2.5, 1.0, 1.5],
+          JPN: [0.5, 0.7, 0.3, 2.5, 2.0],
+        },
+        unemployment: {
+          USA: [3.9, 3.7, 3.5, 5.3, 3.8],
+          CHN: [4.0, 4.1, 4.2, 5.0, 4.8],
+          JPN: [2.4, 2.3, 2.2, 2.8, 2.5],
+        },
+      };
+
+      const mockGoldPrices = {
+        ounce: 2300.5,
+        gram: 2300.5 / 31.1035,
+        kilogram: 2300.5 * 32.1507,
+      };
+
+      const App = () => {
+        const [question, setQuestion] = useState("");
+        const [answer, setAnswer] = useState("");
+        const [conversationHistory, setConversationHistory] = useState([]);
+        const [userProfile, setUserProfile] = useState({});
+        const [selectedStocks, setSelectedStocks] = useState([
+          "AAPL",
+          "MSFT",
+          "TSLA",
+        ]);
+        const [activeTab, setActiveTab] = useState("stock-analysis");
+        const [activeAnalyticsTab, setActiveAnalyticsTab] =
+          useState("portfolio-analysis");
+        const [selectedStockTech, setSelectedStockTech] = useState("AAPL");
+        const [economicIndicator, setEconomicIndicator] = useState("GDP");
+
+        useEffect(() => {
+          // Initialize charts
+          const stockChartCtx = document
+            .getElementById("stockChart")
+            ?.getContext("2d");
+          if (stockChartCtx) {
+            new Chart(stockChartCtx, {
+              type: "line",
+              data: {
+                labels:
+                  mockYfinanceData[selectedStocks[0]]?.history.map(
+                    (d) => d.Date
+                  ) || [],
+                datasets: selectedStocks.map((symbol, index) => ({
+                  label: `${symbol} Price`,
+                  data:
+                    mockYfinanceData[symbol]?.history.map((d) => d.Close) || [],
+                  borderColor: ["#FF6384", "#36A2EB", "#FFCE56"][index % 3],
+                  fill: false,
+                })),
+              },
+              options: {
+                responsive: true,
+                plugins: { title: { display: true, text: "Stock Prices" } },
+              },
+            });
+          }
+
+          const volumeChartCtx = document
+            .getElementById("volumeChart")
+            ?.getContext("2d");
+          if (volumeChartCtx) {
+            new Chart(volumeChartCtx, {
+              type: "bar",
+              data: {
+                labels:
+                  mockYfinanceData[selectedStocks[0]]?.history.map(
+                    (d) => d.Date
+                  ) || [],
+                datasets: selectedStocks.map((symbol, index) => ({
+                  label: `${symbol} Volume`,
+                  data:
+                    mockYfinanceData[symbol]?.history.map((d) => d.Volume) ||
+                    [],
+                  backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"][index % 3],
+                  opacity: 0.6,
+                })),
+              },
+              options: {
+                responsive: true,
+                plugins: { title: { display: true, text: "Trading Volume" } },
+              },
+            });
+          }
+
+          const marketCapChartCtx = document
+            .getElementById("marketCapChart")
+            ?.getContext("2d");
+          if (marketCapChartCtx) {
+            new Chart(marketCapChartCtx, {
+              type: "bar",
+              data: {
+                labels: Object.keys(mockYfinanceData),
+                datasets: [
+                  {
+                    label: "Market Cap (Billions USD)",
+                    data: Object.values(mockYfinanceData).map((d) =>
+                      (d.info.marketCap / 1e9).toFixed(1)
+                    ),
+                    backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  title: {
+                    display: true,
+                    text: "Market Capitalization Comparison",
+                  },
+                },
+              },
+            });
+          }
+
+          const economicChartCtx = document
+            .getElementById("economicChart")
+            ?.getContext("2d");
+          if (economicChartCtx) {
+            new Chart(economicChartCtx, {
+              type: "line",
+              data: {
+                labels: [2018, 2019, 2020, 2021, 2022],
+                datasets: Object.keys(
+                  mockWorldBankData[economicIndicator.toLowerCase()]
+                ).map((country) => ({
+                  label: country,
+                  data: mockWorldBankData[economicIndicator.toLowerCase()][
+                    country
+                  ],
+                  borderColor: ["#FF6384", "#36A2EB", "#FFCE56"][
+                    Object.keys(
+                      mockWorldBankData[economicIndicator.toLowerCase()]
+                    ).indexOf(country) % 3
+                  ],
+                  fill: false,
+                })),
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  title: {
+                    display: true,
+                    text: `${economicIndicator} Trends by Country`,
+                  },
+                },
+              },
+            });
+          }
+
+          const techChartCtx = document
+            .getElementById("techChart")
+            ?.getContext("2d");
+          if (techChartCtx && mockYfinanceData[selectedStockTech]) {
+            const data = mockYfinanceData[selectedStockTech].history;
+            const ma20 = calculateMovingAverage(
+              data.map((d) => d.Close),
+              20
+            );
+            const ma50 = calculateMovingAverage(
+              data.map((d) => d.Close),
+              50
+            );
+            new Chart(techChartCtx, {
+              type: "line",
+              data: {
+                labels: data.map((d) => d.Date),
+                datasets: [
+                  {
+                    label: `${selectedStockTech} Price`,
+                    data: data.map((d) => d.Close),
+                    borderColor: "#FF6384",
+                    fill: false,
+                  },
+                  {
+                    label: "MA20",
+                    data: ma20,
+                    borderColor: "orange",
+                    fill: false,
+                  },
+                  {
+                    label: "MA50",
+                    data: ma50,
+                    borderColor: "red",
+                    fill: false,
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  title: {
+                    display: true,
+                    text: `${selectedStockTech} Technical Analysis`,
+                  },
+                },
+              },
+            });
+          }
+
+          const portfolioChartCtx = document
+            .getElementById("portfolioChart")
+            ?.getContext("2d");
+          if (portfolioChartCtx) {
+            new Chart(portfolioChartCtx, {
+              type: "pie",
+              data: {
+                labels: selectedStocks,
+                datasets: [
+                  {
+                    data: Array(selectedStocks.length).fill(
+                      1 / selectedStocks.length
+                    ),
+                    backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
+                  },
+                ],
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  title: { display: true, text: "Portfolio Allocation" },
+                },
+              },
+            });
+          }
+        }, [selectedStocks, economicIndicator, selectedStockTech]);
+
+        const calculateMovingAverage = (data, period) => {
+          const ma = [];
+          for (let i = 0; i < data.length; i++) {
+            if (i < period - 1) {
+              ma.push(null);
+            } else {
+              const sum = data
+                .slice(i - period + 1, i + 1)
+                .reduce((a, b) => a + b, 0);
+              ma.push(sum / period);
+            }
+          }
+          return ma;
+        };
+
+        const handleSubmit = (e) => {
+          e.preventDefault();
+          if (!question) return;
+
+          // Simulate agent response
+          const mockAnswer = `Analyzing your question: "${question}". Based on available data, here's a sample response. For real data, connect to APIs like yfinance or Alpha Vantage.`;
+          setAnswer(mockAnswer);
+          setConversationHistory([
+            ...conversationHistory,
+            {
+              timestamp: new Date().toISOString(),
+              question,
+              answer: mockAnswer,
+            },
+          ]);
+          setQuestion("");
+
+          // Simulate user profile collection
+          const neededInfo = [
+            "age",
+            "risk_tolerance",
+            "investment_goals",
+          ].filter((info) => question.toLowerCase().includes(info));
+          if (neededInfo.length > 0) {
+            neededInfo.forEach((info) => {
+              setUserProfile((prev) => ({ ...prev, [info]: "Sample Value" }));
+            });
+          }
+        };
+
+        return (
+          <div className="main-container mx-auto max-w-7xl">
+            <div className="main-header">
+              <h1>📈 Agentic AI Financial Assistant</h1>
+              <p>
+                Empowering Wealth Creation with Real-time Insights &
+                Personalized Analysis
+              </p>
+            </div>
+
+            <div className="section-header">📊 Data Sources Status</div>
+            <div className="grid grid-cols-4 gap-4">
+              {[
+                {
+                  name: "Yahoo Finance",
+                  count: Object.keys(mockYfinanceData).length,
+                  status: "active",
+                },
+                {
+                  name: "World Bank",
+                  count: Object.keys(mockWorldBankData).length,
+                  status: "active",
+                },
+                { name: "Alpha Vantage", count: 0, status: "limited" },
+                { name: "Web Research", count: "Available", status: "active" },
+              ].map((source) => (
+                <div key={source.name} className="data-source-card">
+                  <div className="data-source-info">
+                    <span
+                      className={`status-dot status-${source.status}`}
+                    ></span>
+                    <div>
+                      <strong>{source.name}</strong>
+                      <br />
+                      <small>{source.count}</small>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="section-header">💬 Ask Your Financial AI Agent</div>
+            <div className="form-container">
+              <form onSubmit={handleSubmit}>
+                <textarea
+                  className="w-full p-2 border rounded"
+                  placeholder="e.g., Should I invest in Tesla given my moderate risk tolerance and 10-year timeline?"
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  rows="4"
+                ></textarea>
+                <button type="submit" className="submit-button mt-2">
+                  🚀 Ask Agent
+                </button>
+              </form>
+              {answer && (
+                <div className="answer-box mt-4">
+                  <h3>🤖 AI Agent Response:</h3>
+                  <div>{answer}</div>
+                </div>
+              )}
+            </div>
+
+            <div className="section-header">
+              📈 Interactive Financial Dashboard
+            </div>
+            <div className="tab-list">
+              {[
+                "Stock Analysis",
+                "Company Comparison",
+                "Economic Indicators",
+                "Real-time Data",
+              ].map((tab) => (
+                <div
+                  key={tab}
+                  className={`tab ${
+                    activeTab === tab.toLowerCase().replace(" ", "-")
+                      ? "tab-active"
+                      : ""
+                  }`}
+                  onClick={() =>
+                    setActiveTab(tab.toLowerCase().replace(" ", "-"))
+                  }
+                >
+                  📊 {tab}
+                </div>
+              ))}
+            </div>
+
+            {activeTab === "stock-analysis" && (
+              <div>
+                <h3 className="text-lg font-bold">
+                  📊 Advanced Stock Analysis
+                </h3>
+                <select
+                  multiple
+                  className="w-full p-2 border rounded"
+                  value={selectedStocks}
+                  onChange={(e) =>
+                    setSelectedStocks(
+                      Array.from(
+                        e.target.selectedOptions,
+                        (option) => option.value
+                      )
+                    )
+                  }
+                >
+                  {COMPANY_SYMBOLS.map((symbol) => (
+                    <option key={symbol} value={symbol}>
+                      {symbol}
+                    </option>
+                  ))}
+                </select>
+                <canvas id="stockChart" className="mt-4"></canvas>
+                <canvas id="volumeChart" className="mt-4"></canvas>
+              </div>
+            )}
+
+            {activeTab === "company-comparison" && (
+              <div>
+                <h3 className="text-lg font-bold">
+                  🏢 Market Cap & Company Metrics
+                </h3>
+                <canvas id="marketCapChart" className="mt-4"></canvas>
+              </div>
+            )}
+
+            {activeTab === "economic-indicators" && (
+              <div>
+                <h3 className="text-lg font-bold">
+                  🌍 Global Economic Indicators
+                </h3>
+                <select
+                  className="w-full p-2 border rounded"
+                  value={economicIndicator}
+                  onChange={(e) => setEconomicIndicator(e.target.value)}
+                >
+                  <option>GDP</option>
+                  <option>Inflation</option>
+                  <option>Unemployment</option>
+                </select>
+                <canvas id="economicChart" className="mt-4"></canvas>
+              </div>
+            )}
+
+            {activeTab === "real-time-data" && (
+              <div>
+                <h3 className="text-lg font-bold">🔄 Real-time Market Data</h3>
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="p-2">Symbol</th>
+                      <th className="p-2">Company</th>
+                      <th className="p-2">Price</th>
+                      <th className="p-2">Market Cap</th>
+                      <th className="p-2">Sector</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Object.entries(mockYfinanceData)
+                      .slice(0, 6)
+                      .map(([symbol, data]) => (
+                        <tr key={symbol} className="border-t">
+                          <td className="p-2">{symbol}</td>
+                          <td className="p-2">
+                            {data.info.longName.slice(0, 30)}
+                          </td>
+                          <td className="p-2">
+                            ${data.info.currentPrice.toFixed(2)}
+                          </td>
+                          <td className="p-2">
+                            ${(data.info.marketCap / 1e9).toFixed(1)}B
+                          </td>
+                          <td className="p-2">{data.info.sector}</td>
+                        </tr>
+                      ))}
+                  </tbody>
+                </table>
+                <h4 className="mt-4">Major Market Indices</h4>
+                <div className="grid grid-cols-4 gap-4">
+                  <div className="metric-card">S&P 500: 4,567.89 (+2.34%)</div>
+                  <div className="metric-card">NASDAQ: 14,123.45 (+1.89%)</div>
+                  <div className="metric-card">DOW: 35,678.90 (-0.45%)</div>
+                  <div className="metric-card">VIX: 18.45 (-1.23%)</div>
+                </div>
+                <div className="gold-prices mt-4">
+                  <h3>🌟 Golden Treasure Prices 🌟</h3>
+                  <p>
+                    <strong>1 Ounce:</strong> ${mockGoldPrices.ounce.toFixed(2)}{" "}
+                    USD
+                  </p>
+                  <p>
+                    <strong>1 Gram:</strong> ${mockGoldPrices.gram.toFixed(2)}{" "}
+                    USD
+                  </p>
+                  <p>
+                    <strong>1 Kilogram:</strong> $
+                    {mockGoldPrices.kilogram.toFixed(2)} USD
+                  </p>
+                </div>
+              </div>
+            )}
+
+            <div className="section-header">
+              🧮 Advanced Financial Analytics
+            </div>
+            <div className="tab-list">
+              {[
+                "Portfolio Analysis",
+                "Technical Indicators",
+                "Risk Assessment",
+              ].map((tab) => (
+                <div
+                  key={tab}
+                  className={`tab ${
+                    activeAnalyticsTab === tab.toLowerCase().replace(" ", "-")
+                      ? "tab-active"
+                      : ""
+                  }`}
+                  onClick={() =>
+                    setActiveAnalyticsTab(tab.toLowerCase().replace(" ", "-"))
+                  }
+                >
+                  {tab}
+                </div>
+              ))}
+            </div>
+
+            {activeAnalyticsTab === "portfolio-analysis" && (
+              <div>
+                <h3 className="text-lg font-bold">
+                  🔢 Portfolio Performance Analysis
+                </h3>
+                <select
+                  multiple
+                  className="w-full p-2 border rounded"
+                  value={selectedStocks}
+                  onChange={(e) =>
+                    setSelectedStocks(
+                      Array.from(
+                        e.target.selectedOptions,
+                        (option) => option.value
+                      )
+                    )
+                  }
+                >
+                  {COMPANY_SYMBOLS.map((symbol) => (
+                    <option key={symbol} value={symbol}>
+                      {symbol}
+                    </option>
+                  ))}
+                </select>
+                <table className="w-full border-collapse mt-4">
+                  <thead>
+                    <tr className="bg-gray-100">
+                      <th className="p-2">Stock</th>
+                      <th className="p-2">Weight</th>
+                      <th className="p-2">Price</th>
+                      <th className="p-2">Market Cap</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {selectedStocks.map((symbol) => (
+                      <tr key={symbol} className="border-t">
+                        <td className="p-2">{symbol}</td>
+                        <td className="p-2">
+                          {((1 / selectedStocks.length) * 100).toFixed(1)}%
+                        </td>
+                        <td className="p-2">
+                          $
+                          {mockYfinanceData[symbol]?.info.currentPrice.toFixed(
+                            2
+                          ) || "N/A"}
+                        </td>
+                        <td className="p-2">
+                          $
+                          {(
+                            mockYfinanceData[symbol]?.info.marketCap / 1e9
+                          ).toFixed(1) || "N/A"}
+                          B
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <canvas id="portfolioChart" className="mt-4"></canvas>
+              </div>
+            )}
+
+            {activeAnalyticsTab === "technical-indicators" && (
+              <div>
+                <h3 className="text-lg font-bold">📈 Technical Analysis</h3>
+                <select
+                  className="w-full p-2 border rounded"
+                  value={selectedStockTech}
+                  onChange={(e) => setSelectedStockTech(e.target.value)}
+                >
+                  {COMPANY_SYMBOLS.map((symbol) => (
+                    <option key={symbol} value={symbol}>
+                      {symbol}
+                    </option>
+                  ))}
+                </select>
+                <canvas id="techChart" className="mt-4"></canvas>
+                <div className="grid grid-cols-3 gap-4 mt-4">
+                  <div className="metric-card">
+                    Current Price: $
+                    {mockYfinanceData[
+                      selectedStockTech
+                    ]?.info.currentPrice.toFixed(2) || "N/A"}
+                  </div>
+                  <div className="metric-card">20-Day Trend: Bullish</div>
+                  <div className="metric-card">50-Day Trend: Bullish</div>
+                </div>
+              </div>
+            )}
+
+            {activeAnalyticsTab === "risk-assessment" && (
+              <div>
+                <h3 className="text-lg font-bold">
+                  🎯 Risk Assessment & Recommendations
+                </h3>
+                <div className="text-blue-600">Risk Score: 5 (Moderate)</div>
+                <div className="bg-blue-100 p-4 rounded mt-4">
+                  ⚖️ Balanced Strategy: Mix of growth and value stocks with some
+                  bonds for stability.
+                </div>
+              </div>
+            )}
+
+            <div className="footer">
+              <h3>📈 Advanced Agentic AI Financial Assistant</h3>
+              <p>
+                Powered by React • Real-time Web Research • Multi-source
+                Financial Data
+              </p>
+              <p>
+                <strong>Capabilities:</strong> Personalized Analysis • Market
+                Research • Risk Assessment • Technical Analysis
+              </p>
+              <p>© 2025 xAI • All Rights Reserved</p>
+            </div>
+
+            <div className="sidebar fixed top-0 right-0 h-full w-64 p-4">
+              <div className="sidebar-section">
+                <h3>🤖 Agent Status</h3>
+                <div className="text-green-400">✅ Agentic AI Active</div>
+                <div className="text-blue-300">🧠 React Powered</div>
+                <div className="text-blue-300">🔍 Web Research Enabled</div>
+                <div className="text-blue-300">📊 Multi-Source Analysis</div>
+              </div>
+              <div className="sidebar-section">
+                <h3>👤 Your Profile</h3>
+                {Object.entries(userProfile).map(([key, value]) => (
+                  <div key={key}>
+                    <strong>{key.replace("_", " ").toUpperCase()}</strong>:{" "}
+                    {value}
+                  </div>
+                ))}
+                <button
+                  className="submit-button mt-2 w-full"
+                  onClick={() => setUserProfile({})}
+                >
+                  🔄 Clear Profile
+                </button>
+              </div>
+              <div className="sidebar-section">
+                <h3>💬 Recent Conversations</h3>
+                {conversationHistory
+                  .slice(-5)
+                  .reverse()
+                  .map((entry, index) => (
+                    <div key={index} className="expander">
+                      <div>
+                        <strong>Q{conversationHistory.length - index}:</strong>{" "}
+                        {entry.question.slice(0, 40)}...
+                      </div>
+                      <div>
+                        <strong>Time:</strong> {entry.timestamp}
+                      </div>
+                      <div>
+                        <strong>Answer:</strong> {entry.answer.slice(0, 200)}...
+                      </div>
+                    </div>
+                  ))}
+                <button
+                  className="submit-button mt-2 w-full"
+                  onClick={() => setConversationHistory([])}
+                >
+                  🗑️ Clear History
+                </button>
+              </div>
+              <div className="sidebar-section">
+                <h3>🛠️ Agent Tools</h3>
+                <div>✅ Financial Database Search</div>
+                <div>✅ Real-time Web Research</div>
+                <div>✅ Market Sentiment Analysis</div>
+                <div>✅ Financial Calculations</div>
+                <div>✅ Personalized Recommendations</div>
+              </div>
+              <div className="sidebar-section">
+                <h3>🎯 Agent Features</h3>
+                <div>🧠 Memory of conversations</div>
+                <div>👤 User profile building</div>
+                <div>🔍 Multi-step reasoning</div>
+                <div>📊 Data visualization</div>
+                <div>🌐 Internet research</div>
+                <div>📈 Real-time analysis</div>
+              </div>
+            </div>
+          </div>
+        );
+      };
+
+      ReactDOM.render(<App />, document.getElementById("root"));
+    </script>
+  </body>
+</html>
